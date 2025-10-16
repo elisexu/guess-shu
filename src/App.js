@@ -320,9 +320,9 @@ const App = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8 text-amber-700 text-sm font-serif">
-          A new book every day • Share with fellow readers
-        </div>
+        {/* <div className="text-center mt-8 text-amber-700 text-sm font-serif">
+          a new book every day :D'
+        </div> */}
       </div>
     </div>
   );
