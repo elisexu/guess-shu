@@ -34,7 +34,7 @@ const BOOKS = [
   { title: "The Unbearable Lightness of Being", author: "Milan Kundera" }
 ];
 
-const MAX_GUESSES = 10;
+const MAX_GUESSES = 5;
 
 const getDayIndex = () => {
   const start = new Date('2025-01-01');
@@ -146,7 +146,7 @@ const App = () => {
 
   const getPixelation = () => {
     if (gameState !== 'playing') return 0;
-    const level = Math.max(0, 50 - (guesses.length * 5));
+    const level = Math.max(0, 40 - (guesses.length * 8));
     return level;
   };
 
