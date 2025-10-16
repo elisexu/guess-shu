@@ -79,15 +79,10 @@ const App = () => {
       // Fetch book data from OpenLibrary
       try {
         // First, search for the book
-        const searchQuery = `title:${todayBook.title} author:${todayBook.author}`;
+        const searchQuery = `title=${todayBook.title}`;
+        // console.log(`https://openlibrary.org/search.json?title=${encodeURIComponent(todayBook.title)}&limit=5`);
         const searchResponse = await fetch(
-          `https://openlibrary.org/search.json?q=${encodeURIComponent(searchQuery)}&limit=5`,
-          {
-            headers: {
-              'User-Agent': 'GuessShu/1.0 (elisexu98@gmail.com)'
-            }
-          }
-        );
+          `https://openlibrary.org/search.json?q=${encodeURIComponent(todayBook.title)}&limit=5`,);
         const searchData = await searchResponse.json();
         
         if (searchData.docs && searchData.docs.length > 0) {
@@ -102,6 +97,8 @@ const App = () => {
             subject: exactMatch.subject ? exactMatch.subject.slice(0, 3).join(', ') : 'Literary Fiction',
             description: exactMatch.first_sentence ? exactMatch.first_sentence[0] : ''
           });
+          // console.log(bookData);
+
         }
       } catch (err) {
         console.error('Error fetching book data:', err);
@@ -194,7 +191,7 @@ const App = () => {
             <BookOpen className="text-amber-900" size={32} />
             <h1 className="text-4xl font-serif font-bold text-amber-900">Guess Shu (书)</h1>
           </div>
-          <p className="text-amber-700 font-serif">Because you need another book to add to your TBR.</p>
+          <p className="text-amber-700 font-serif">Because you need another book for your TBR.</p>
         </div>
 
         {/* Game Area */}
