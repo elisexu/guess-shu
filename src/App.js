@@ -188,8 +188,7 @@ const App = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <BookOpen className="text-amber-900" size={32} />
-            <h1 className="text-4xl font-serif font-bold text-amber-900">Guess Shu (书)</h1>
+            <h1 className="text-4xl font-serif font-bold text-amber-900">📚 Guess Shu (书)</h1>
           </div>
           <p className="text-amber-700 font-serif">Because you need another book for your TBR.</p>
         </div>
