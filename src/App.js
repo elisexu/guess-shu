@@ -9,7 +9,7 @@ const BOOKS = [
   { title: "A Room of One's Own", author: "Virginia Woolf" },
   { title: "Atonement", author: "Ian McEwan" },
   { title: "The English Patient", author: "Michael Ondaatje" },
-  { title: "One Hundred Years of Solitude", author: "Gabriel Garcia Marquez" },
+  { title: "One Hundred Years of Solitude", author: "Gabriel García Márquez" },
   { title: "Romance of the Three Kingdoms", author: "Luo Guanzhong" },
   { title: "A Tree Grows in Brooklyn", author: "Betty Smith" },
   { title: "Normal People", author: "Sally Rooney" },
@@ -55,6 +55,7 @@ const App = () => {
   const [gameState, setGameState] = useState('playing'); // playing, won, lost
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [revealedPositions, setRevealedPositions] = useState([]);
 
   useEffect(() => {
     const initGame = async () => {
@@ -70,6 +71,7 @@ const App = () => {
         if (data.date === today) {
           setGuesses(data.guesses || []);
           setGameState(data.gameState || 'playing');
+          setRevealedPositions(data.revealedPositions || []);
         } else {
           // New day, clear old data
           localStorage.removeItem('guessShu');
@@ -80,9 +82,9 @@ const App = () => {
       try {
         // First, search for the book
         const searchQuery = `title=${todayBook.title}`;
-        // console.log(`https://openlibrary.org/search.json?title=${encodeURIComponent(todayBook.title)}&limit=5`);
         const searchResponse = await fetch(
-          `https://openlibrary.org/search.json?q=${encodeURIComponent(todayBook.title)}&limit=5`,);
+          `https://openlibrary.org/search.json?q=${encodeURIComponent(todayBook.title)}&limit=5`
+        );
         const searchData = await searchResponse.json();
         
         if (searchData.docs && searchData.docs.length > 0) {
@@ -97,8 +99,6 @@ const App = () => {
             subject: exactMatch.subject ? exactMatch.subject.slice(0, 3).join(', ') : 'Literary Fiction',
             description: exactMatch.first_sentence ? exactMatch.first_sentence[0] : ''
           });
-          // console.log(bookData);
-
         }
       } catch (err) {
         console.error('Error fetching book data:', err);
@@ -116,10 +116,11 @@ const App = () => {
       localStorage.setItem('guessShu', JSON.stringify({
         date: today,
         guesses,
-        gameState
+        gameState,
+        revealedPositions
       }));
     }
-  }, [guesses, gameState, currentBook]);
+  }, [guesses, gameState, currentBook, revealedPositions]);
 
   const handleGuess = () => {
     if (!guess.trim() || gameState !== 'playing') return;
@@ -134,6 +135,19 @@ const App = () => {
       setGameState('won');
       setError('');
     } else {
+      // Reveal a random letter on incorrect guess
+      const letterPositions = [];
+      for (let i = 0; i < currentBook.title.length; i++) {
+        if (currentBook.title[i] !== ' ' && !revealedPositions.includes(i)) {
+          letterPositions.push(i);
+        }
+      }
+      
+      if (letterPositions.length > 0) {
+        const randomPos = letterPositions[Math.floor(Math.random() * letterPositions.length)];
+        setRevealedPositions([...revealedPositions, randomPos]);
+      }
+
       if (newGuesses.length >= MAX_GUESSES) {
         setGameState('lost');
       }
@@ -152,9 +166,11 @@ const App = () => {
 
   const getMaskedTitle = () => {
     if (!currentBook) return '';
-    return currentBook.title.split('').map(char => 
-      char === ' ' ? ' ' : '_'
-    ).join('');
+    return currentBook.title.split('').map((char, index) => {
+      if (char === ' ') return ' ';
+      if (revealedPositions.includes(index)) return char;
+      return '_';
+    }).join('');
   };
 
   const shareResults = () => {
@@ -318,11 +334,6 @@ const App = () => {
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        {/* <div className="text-center mt-8 text-amber-700 text-sm font-serif">
-          a new book every day :D'
-        </div> */}
       </div>
     </div>
   );
